@@ -1,0 +1,362 @@
+package com.victor_olivier.projet_androide
+
+import android.net.Uri
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.browser.customtabs.CustomTabsClient
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.browser.customtabs.CustomTabsServiceConnection
+import androidx.browser.customtabs.CustomTabsSession
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.button.MaterialButton
+import com.victor_olivier.projet_androide.data.api.Api
+import com.victor_olivier.projet_androide.data.api.ApiRoutes
+import com.victor_olivier.projet_androide.data.model.Device
+import com.victor_olivier.projet_androide.data.model.DevicesResponse
+import com.victor_olivier.projet_androide.data.storage.TokenStore
+
+class DevicesActivity : AppCompatActivity() {
+
+    private var houseId: Int = -1
+    private var token: String? = null
+    private lateinit var houseUrl: String
+
+    private lateinit var webHouse: WebView
+    private lateinit var lvDevices: ListView
+    private lateinit var spinnerType: Spinner
+    private lateinit var spinnerState: Spinner
+
+    private lateinit var tvHouseId: TextView
+    private lateinit var tvOwner: TextView
+    private lateinit var tvLightsOn: TextView
+    private lateinit var tvShuttersOpen: TextView
+    private lateinit var tvDoorsOpen: TextView
+    private lateinit var tvGarageOpen: TextView
+
+    private lateinit var panelComponents: View
+    private lateinit var panelGroup: View
+    private lateinit var panelUsers: View
+
+    private val allDevices = arrayListOf<Device>()
+    private val deviceLines = arrayListOf<String>()
+    private lateinit var adapter: ArrayAdapter<String>
+
+    private var selectedType: String = "Tous"
+    private var selectedState: String = "Tous"
+
+    private var isLoadingDevices = false
+    private var devicesLoadedAtLeastOnce = false
+
+    // instance navigateur requise
+    private var pendingBrowserInitRetry = false
+    private var alreadyOpenedCustomTabForInit = false
+
+    // CustomTabs warmup/prefetch
+    private var customTabsSession: CustomTabsSession? = null
+    private var serviceConnection: CustomTabsServiceConnection? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_devices)
+
+        houseId = intent.getIntExtra("houseId", -1)
+        token = TokenStore(this).getToken()
+
+        if (houseId == -1 || token.isNullOrBlank()) {
+            Toast.makeText(this, "houseId/token manquant", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        houseUrl = ApiRoutes.HOUSE_BROWSER(houseId)
+
+        val toolbar = findViewById<MaterialToolbar>(R.id.toolbarDevices)
+        toolbar.title = "Maison #$houseId"
+        toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_logout -> {
+                    doLogout()
+                    true
+                }
+                else -> false
+            }
+        }
+
+        webHouse = findViewById(R.id.webHouse)
+        lvDevices = findViewById(R.id.lvDevices)
+        spinnerType = findViewById(R.id.spinnerType)
+        spinnerState = findViewById(R.id.spinnerState)
+
+        tvHouseId = findViewById(R.id.tvHouseId)
+        tvOwner = findViewById(R.id.tvOwner)
+        tvLightsOn = findViewById(R.id.tvLightsOn)
+        tvShuttersOpen = findViewById(R.id.tvShuttersOpen)
+        tvDoorsOpen = findViewById(R.id.tvDoorsOpen)
+        tvGarageOpen = findViewById(R.id.tvGarageOpen)
+
+        panelComponents = findViewById(R.id.panelComponents)
+        panelGroup = findViewById(R.id.panelGroup)
+        panelUsers = findViewById(R.id.panelUsers)
+
+        // Onglet 1 ouvert par défaut
+        panelComponents.visibility = View.VISIBLE
+        panelGroup.visibility = View.GONE
+        panelUsers.visibility = View.GONE
+
+        tvHouseId.text = "Maison : #$houseId"
+        tvOwner.text = "Propriétaire : (à venir)"
+
+        setupAccordion(findViewById(R.id.btnToggleComponents), panelComponents)
+        setupAccordion(findViewById(R.id.btnToggleGroup), panelGroup)
+        setupAccordion(findViewById(R.id.btnToggleUsers), panelUsers)
+
+        findViewById<View>(R.id.btnAddUser).setOnClickListener {
+            Toast.makeText(this, "Add utilisateur (à venir)", Toast.LENGTH_SHORT).show()
+        }
+
+        adapter = ArrayAdapter(this, R.layout.item_device, R.id.tvDeviceLine, deviceLines)
+        lvDevices.adapter = adapter
+
+        setupStateSpinner()
+        setupTypeSpinner(listOf("Tous"))
+
+        // WebView immédiate
+        setupWebView(webHouse)
+        webHouse.loadUrl(houseUrl)
+
+        // warmup chrome immédiat
+        warmupChromeAndPrefetch(houseUrl)
+
+        // ✅ LOAD DEVICES IMMÉDIAT (zéro délai)
+        loadDevices()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (pendingBrowserInitRetry) {
+            pendingBrowserInitRetry = false
+            // ✅ retry immédiat
+            loadDevices()
+        }
+    }
+
+    private fun doLogout() {
+        try { TokenStore(this).saveToken("") } catch (_: Exception) {}
+        Toast.makeText(this, "Déconnecté", Toast.LENGTH_SHORT).show()
+        val i = android.content.Intent(this, MainActivity::class.java)
+        i.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(i)
+        finish()
+    }
+
+    private fun setupAccordion(button: MaterialButton, panel: View) {
+        button.setOnClickListener {
+            val willShow = panel.visibility != View.VISIBLE
+            panel.visibility = if (willShow) View.VISIBLE else View.GONE
+
+            if (panel.id == R.id.panelComponents && willShow) {
+                applyFiltersAndRender()
+            }
+        }
+    }
+
+    private fun setupWebView(webView: WebView) {
+        val s = webView.settings
+        s.javaScriptEnabled = true
+        s.domStorageEnabled = true
+        s.cacheMode = WebSettings.LOAD_DEFAULT
+        s.useWideViewPort = true
+        s.loadWithOverviewMode = true
+        s.mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+
+        webView.webChromeClient = WebChromeClient()
+
+        webView.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean = false
+
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                // ✅ dès que la page est prête => retente devices immédiatement
+                loadDevices()
+            }
+        }
+    }
+
+    private fun warmupChromeAndPrefetch(url: String) {
+        val chromePackage = "com.android.chrome"
+
+        serviceConnection = object : CustomTabsServiceConnection() {
+            override fun onCustomTabsServiceConnected(
+                name: android.content.ComponentName,
+                client: CustomTabsClient
+            ) {
+                client.warmup(0L)
+                customTabsSession = client.newSession(null)
+                customTabsSession?.mayLaunchUrl(Uri.parse(url), null, null)
+                Log.d("API", "CustomTabs warmup + prefetch OK")
+            }
+
+            override fun onServiceDisconnected(name: android.content.ComponentName) {
+                customTabsSession = null
+            }
+        }
+
+        try {
+            CustomTabsClient.bindCustomTabsService(this, chromePackage, serviceConnection!!)
+        } catch (e: Exception) {
+            Log.d("API", "CustomTabs bind failed: ${e.message}")
+        }
+    }
+
+    private fun openHouseInCustomTabForInit(url: String) {
+        if (alreadyOpenedCustomTabForInit) return
+        alreadyOpenedCustomTabForInit = true
+
+        val intent = CustomTabsIntent.Builder(customTabsSession)
+            .setShowTitle(true)
+            .build()
+
+        pendingBrowserInitRetry = true
+        intent.launchUrl(this, Uri.parse(url))
+    }
+
+    private fun setupTypeSpinner(types: List<String>) {
+        val a = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, types)
+        spinnerType.adapter = a
+
+        val idx = types.indexOf(selectedType)
+        if (idx >= 0) spinnerType.setSelection(idx)
+
+        spinnerType.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedType = types[position]
+                applyFiltersAndRender()
+            }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+        }
+    }
+
+    private fun setupStateSpinner() {
+        val states = listOf("Tous", "Allumés", "Éteints", "Ouverts", "Fermés")
+        val a = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, states)
+        spinnerState.adapter = a
+
+        spinnerState.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedState = states[position]
+                applyFiltersAndRender()
+            }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+        }
+    }
+
+    private fun loadDevices() {
+        if (isLoadingDevices) return
+        val t = token ?: return
+
+        isLoadingDevices = true
+
+        Api().get<DevicesResponse>(
+            ApiRoutes.DEVICES(houseId),
+            onSuccess = { code, body ->
+                runOnUiThread {
+                    isLoadingDevices = false
+                    Log.d("API", "DEVICES code=$code bodyNull=${body == null} size=${body?.devices?.size}")
+
+                    if (code == 200 && body != null) {
+                        devicesLoadedAtLeastOnce = true
+                        alreadyOpenedCustomTabForInit = false
+
+                        allDevices.clear()
+                        allDevices.addAll(body.devices)
+
+                        val types = mutableListOf("Tous")
+                        types.addAll(allDevices.map { it.type }.distinct().sorted())
+                        setupTypeSpinner(types)
+
+                        updateInfoPanel()
+                        applyFiltersAndRender()
+
+                        if (panelComponents.visibility != View.VISIBLE) {
+                            panelComponents.visibility = View.VISIBLE
+                        }
+
+                    } else {
+                        // ✅ si serveur exige instance navigateur: on l’ouvre direct (custom tab)
+                        if (code == 500 && !devicesLoadedAtLeastOnce) {
+                            Toast.makeText(this, "Initialisation maison…", Toast.LENGTH_SHORT).show()
+                            openHouseInCustomTabForInit(houseUrl)
+                            return@runOnUiThread
+                        }
+
+                        val msg = when (code) {
+                            403 -> "Accès interdit"
+                            404 -> "Maison introuvable"
+                            500 -> "Serveur: instance navigateur requise"
+                            else -> "Erreur devices ($code)"
+                        }
+                        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            },
+            securityToken = t
+        )
+    }
+
+    private fun updateInfoPanel() {
+        val lightsOn = allDevices.count { it.type.lowercase().contains("light") && (it.power ?: 0) > 0 }
+        val shuttersOpen = allDevices.count { it.type.lowercase().contains("shutter") && (it.opening ?: 0) > 0 }
+        val doorsOpen = allDevices.count {
+            it.type.lowercase().contains("door") &&
+                    (it.opening ?: 0) > 0 &&
+                    !it.type.lowercase().contains("garage")
+        }
+        val garageOpen = allDevices.count { it.type.lowercase().contains("garage") && (it.opening ?: 0) > 0 }
+
+        tvLightsOn.text = "Lumières allumées : $lightsOn"
+        tvShuttersOpen.text = "Volets ouverts : $shuttersOpen"
+        tvDoorsOpen.text = "Portes ouvertes : $doorsOpen"
+        tvGarageOpen.text = "Garage ouvert : $garageOpen"
+    }
+
+    private fun applyFiltersAndRender() {
+        val filtered = allDevices.filter { d ->
+            val okType = (selectedType == "Tous") || (d.type == selectedType)
+
+            val okState = when (selectedState) {
+                "Tous" -> true
+                "Allumés" -> (d.power != null && d.power > 0)
+                "Éteints" -> (d.power != null && d.power == 0)
+                "Ouverts" -> (d.opening != null && d.opening > 0)
+                "Fermés" -> (d.opening != null && d.opening == 0)
+                else -> true
+            }
+            okType && okState
+        }
+
+        deviceLines.clear()
+        deviceLines.addAll(filtered.map { lineForDevice(it) })
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun lineForDevice(d: Device): String {
+        val state = when {
+            d.opening != null -> "Ouverture: ${d.opening}%"
+            d.power != null -> "Puissance: ${d.power}%"
+            else -> "État: -"
+        }
+        return "${d.type} (#${d.id}) — $state"
+    }
+}
