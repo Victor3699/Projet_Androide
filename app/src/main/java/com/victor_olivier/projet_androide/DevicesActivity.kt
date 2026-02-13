@@ -29,6 +29,21 @@ import com.victor_olivier.projet_androide.data.storage.TokenStore
 
 class DevicesActivity : AppCompatActivity() {
 
+    companion object {
+        private const val FILTER_ALL = "Tous"
+        private const val FILTER_ON = "Allumés"
+        private const val FILTER_OFF = "Éteints"
+        private const val FILTER_OPEN = "Ouverts"
+        private const val FILTER_CLOSED = "Fermés"
+
+        private const val TYPE_LIGHT = "light"
+        private const val TYPE_SHUTTER = "shutter"
+        private const val TYPE_DOOR = "door"
+        private const val TYPE_GARAGE = "garage"
+
+        private val DEVICE_STATES = listOf(FILTER_ALL, FILTER_ON, FILTER_OFF, FILTER_OPEN, FILTER_CLOSED)
+    }
+
     private var houseId: Int = -1
     private var token: String? = null
     private lateinit var houseUrl: String
@@ -53,8 +68,8 @@ class DevicesActivity : AppCompatActivity() {
     private val deviceLines = arrayListOf<String>()
     private lateinit var adapter: ArrayAdapter<String>
 
-    private var selectedType: String = "Tous"
-    private var selectedState: String = "Tous"
+    private var selectedType: String = FILTER_ALL
+    private var selectedState: String = FILTER_ALL
 
     private var isLoadingDevices = false
     private var devicesLoadedAtLeastOnce = false
@@ -130,7 +145,7 @@ class DevicesActivity : AppCompatActivity() {
         lvDevices.adapter = adapter
 
         setupStateSpinner()
-        setupTypeSpinner(listOf("Tous"))
+        setupTypeSpinner(listOf(FILTER_ALL))
 
         // WebView immédiate
         setupWebView(webHouse)
@@ -249,13 +264,12 @@ class DevicesActivity : AppCompatActivity() {
     }
 
     private fun setupStateSpinner() {
-        val states = listOf("Tous", "Allumés", "Éteints", "Ouverts", "Fermés")
-        val a = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, states)
+        val a = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, DEVICE_STATES)
         spinnerState.adapter = a
 
         spinnerState.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
-                selectedState = states[position]
+                selectedState = DEVICE_STATES[position]
                 applyFiltersAndRender()
             }
             override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
@@ -282,7 +296,7 @@ class DevicesActivity : AppCompatActivity() {
                         allDevices.clear()
                         allDevices.addAll(body.devices)
 
-                        val types = mutableListOf("Tous")
+                        val types = mutableListOf(FILTER_ALL)
                         types.addAll(allDevices.map { it.type }.distinct().sorted())
                         setupTypeSpinner(types)
 
@@ -316,14 +330,14 @@ class DevicesActivity : AppCompatActivity() {
     }
 
     private fun updateInfoPanel() {
-        val lightsOn = allDevices.count { it.type.lowercase().contains("light") && (it.power ?: 0) > 0 }
-        val shuttersOpen = allDevices.count { it.type.lowercase().contains("shutter") && (it.opening ?: 0) > 0 }
+        val lightsOn = allDevices.count { it.isType(TYPE_LIGHT) && (it.power ?: 0) > 0 }
+        val shuttersOpen = allDevices.count { it.isType(TYPE_SHUTTER) && (it.opening ?: 0) > 0 }
         val doorsOpen = allDevices.count {
-            it.type.lowercase().contains("door") &&
+            it.isType(TYPE_DOOR) &&
                     (it.opening ?: 0) > 0 &&
-                    !it.type.lowercase().contains("garage")
+                    !it.isType(TYPE_GARAGE)
         }
-        val garageOpen = allDevices.count { it.type.lowercase().contains("garage") && (it.opening ?: 0) > 0 }
+        val garageOpen = allDevices.count { it.isType(TYPE_GARAGE) && (it.opening ?: 0) > 0 }
 
         tvLightsOn.text = "Lumières allumées : $lightsOn"
         tvShuttersOpen.text = "Volets ouverts : $shuttersOpen"
@@ -333,14 +347,14 @@ class DevicesActivity : AppCompatActivity() {
 
     private fun applyFiltersAndRender() {
         val filtered = allDevices.filter { d ->
-            val okType = (selectedType == "Tous") || (d.type == selectedType)
+            val okType = (selectedType == FILTER_ALL) || (d.type == selectedType)
 
             val okState = when (selectedState) {
-                "Tous" -> true
-                "Allumés" -> (d.power != null && d.power > 0)
-                "Éteints" -> (d.power != null && d.power == 0)
-                "Ouverts" -> (d.opening != null && d.opening > 0)
-                "Fermés" -> (d.opening != null && d.opening == 0)
+                FILTER_ALL -> true
+                FILTER_ON -> (d.power != null && d.power > 0)
+                FILTER_OFF -> (d.power != null && d.power == 0)
+                FILTER_OPEN -> (d.opening != null && d.opening > 0)
+                FILTER_CLOSED -> (d.opening != null && d.opening == 0)
                 else -> true
             }
             okType && okState
@@ -350,6 +364,8 @@ class DevicesActivity : AppCompatActivity() {
         deviceLines.addAll(filtered.map { lineForDevice(it) })
         adapter.notifyDataSetChanged()
     }
+
+    private fun Device.isType(typeKey: String): Boolean = type.lowercase().contains(typeKey)
 
     private fun lineForDevice(d: Device): String {
         val state = when {
