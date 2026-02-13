@@ -3,7 +3,7 @@
     android:id="@+id/tvDeviceLine"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/bg_device_item"
     android:padding="12dp"
-    android:textColor="#FFFFFF"
-    android:textSize="16sp"
-    android:background="#141414" />
+    android:textColor="@color/app_text_primary"
+    android:textSize="16sp" />
