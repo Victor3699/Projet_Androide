@@ -18,12 +18,12 @@
     <WebView
         android:id="@+id/webHouse"
         android:layout_width="match_parent"
-        android:layout_height="260dp" />
+        android:layout_height="240dp" />
 
-    <!-- Bloc infos -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/app_surface"
         android:orientation="vertical"
         android:padding="12dp"
         android:background="@color/app_surface">
@@ -72,7 +72,6 @@
             android:textColor="@color/app_text_secondary" />
     </LinearLayout>
 
-    <!-- Onglet 1 -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnToggleComponents"
         android:layout_width="match_parent"
@@ -88,8 +87,10 @@
         android:id="@+id/panelComponents"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:background="@color/app_surface"
         android:orientation="vertical"
-        android:visibility="gone"
         android:padding="12dp"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
@@ -98,29 +99,90 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_device_item"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Type"
+                    android:textColor="@color/app_text_secondary"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/spinnerType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="État"
+                    android:textColor="@color/app_text_secondary"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/spinnerState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="end"
             android:orientation="horizontal">
 
-            <Spinner
-                android:id="@+id/spinnerType"
-                android:layout_width="0dp"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSelectAll"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:text="Tout sélectionner" />
 
-            <Spinner
-                android:id="@+id/spinnerState"
-                android:layout_width="0dp"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBatchOn"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_marginStart="8dp"
+                android:text="Activer" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBatchOff"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Désactiver" />
         </LinearLayout>
 
         <ListView
             android:id="@+id/lvDevices"
             android:layout_width="match_parent"
             android:layout_height="220dp"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="8dp" />
     </LinearLayout>
 
-    <!-- Onglet 2 -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnToggleGroup"
         android:layout_width="match_parent"
@@ -136,13 +198,14 @@
         android:id="@+id/panelGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:background="@color/app_surface"
         android:padding="12dp"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
         android:background="@color/app_surface"/>
 
-    <!-- Onglet 3 -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnToggleUsers"
         android:layout_width="match_parent"
@@ -158,7 +221,9 @@
         android:id="@+id/panelUsers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:background="@color/app_surface"
         android:padding="12dp"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
