@@ -4,8 +4,8 @@
     android:id="@+id/rootDevices"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/app_background"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/app_background">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarDevices"
@@ -25,7 +25,8 @@
         android:layout_height="wrap_content"
         android:background="@color/app_surface"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="12dp"
+        android:background="@color/app_surface">
 
         <TextView
             android:id="@+id/tvHouseId"
@@ -75,12 +76,12 @@
         android:id="@+id/btnToggleComponents"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="12dp"
         android:text="1 • Composants"
         android:textColor="@color/app_text_primary"
-        app:backgroundTint="@color/app_accent_dark" />
+        app:backgroundTint="@color/app_accent_dark"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp" />
 
     <LinearLayout
         android:id="@+id/panelComponents"
@@ -91,15 +92,9 @@
         android:background="@color/app_surface"
         android:orientation="vertical"
         android:padding="12dp"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Filtres"
-            android:textColor="@color/app_text_primary"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:background="@color/app_surface">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -192,12 +187,12 @@
         android:id="@+id/btnToggleGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="12dp"
         android:text="2 • Commande de groupe (à venir)"
         android:textColor="@color/app_text_primary"
-        app:backgroundTint="@color/app_accent_dark" />
+        app:backgroundTint="@color/app_accent_dark"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp" />
 
     <LinearLayout
         android:id="@+id/panelGroup"
@@ -207,18 +202,20 @@
         android:layout_marginEnd="12dp"
         android:background="@color/app_surface"
         android:padding="12dp"
-        android:visibility="gone" />
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:background="@color/app_surface"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnToggleUsers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="12dp"
         android:text="3 • Utilisateurs (à venir)"
         android:textColor="@color/app_text_primary"
-        app:backgroundTint="@color/app_accent_dark" />
+        app:backgroundTint="@color/app_accent_dark"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp" />
 
     <LinearLayout
         android:id="@+id/panelUsers"
@@ -228,7 +225,9 @@
         android:layout_marginEnd="12dp"
         android:background="@color/app_surface"
         android:padding="12dp"
-        android:visibility="gone">
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:background="@color/app_surface">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAddUser"
@@ -236,7 +235,7 @@
             android:layout_height="wrap_content"
             android:text="+ Add"
             android:textColor="@color/app_text_primary"
-            app:backgroundTint="@color/app_button_neutral" />
+            app:backgroundTint="@color/app_button_neutral"/>
     </LinearLayout>
 
 </LinearLayout>

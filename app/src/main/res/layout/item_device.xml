@@ -2,51 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
     android:background="@drawable/bg_device_item"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:padding="10dp">
-
-    <CheckBox
-        android:id="@+id/cbSelectDevice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:buttonTint="@color/app_accent"
-        android:minWidth="40dp"
-        android:minHeight="40dp" />
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp">
-
-        <TextView
-            android:id="@+id/tvDeviceName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/app_text_primary"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvDeviceState"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textColor="@color/app_text_secondary"
-            android:textSize="13sp" />
-    </LinearLayout>
-
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/swDeviceState"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minWidth="56dp"
-        android:minHeight="40dp"
-        android:textColor="@color/app_text_primary" />
-
-</LinearLayout>
+    android:padding="12dp"
+    android:textColor="@color/app_text_primary"
+    android:textSize="16sp" />
