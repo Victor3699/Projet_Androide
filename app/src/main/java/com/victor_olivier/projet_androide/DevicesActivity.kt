@@ -376,18 +376,50 @@ class DevicesActivity : AppCompatActivity() {
             return
         }
 
+        val encodedCommand = Uri.encode(command)
+        val candidateUrls = listOf(
+            ApiRoutes.DEVICE_COMMAND_PATH(houseId, device.id, encodedCommand),
+            ApiRoutes.DEVICE_COMMANDS_PATH(houseId, device.id, encodedCommand),
+            ApiRoutes.DEVICE_COMMAND_QUERY(houseId, device.id, encodedCommand)
+        )
+
+        tryCommandWithFallback(
+            urls = candidateUrls,
+            index = 0,
+            tokenValue = t,
+            onResult = { success, lastCode ->
+                if (!success) {
+                    Toast.makeText(this, "Commande ${device.id} refusée (${lastCode ?: -1})", Toast.LENGTH_SHORT).show()
+                }
+                onDone(success)
+            }
+        )
+    }
+
+    private fun tryCommandWithFallback(
+        urls: List<String>,
+        index: Int,
+        tokenValue: String,
+        onResult: (Boolean, Int?) -> Unit
+    ) {
+        if (index >= urls.size) {
+            onResult(false, null)
+            return
+        }
+
         Api().request<Unit>(
-            ApiRoutes.DEVICE_COMMAND(houseId, device.id, Uri.encode(command)),
+            urls[index],
             method = "PUT",
             onSuccess = { code ->
                 if (code in 200..299) {
-                    onDone(true)
+                    onResult(true, code)
+                } else if (code == 404 && index < urls.lastIndex) {
+                    tryCommandWithFallback(urls, index + 1, tokenValue, onResult)
                 } else {
-                    Toast.makeText(this, "Commande ${device.id} refusée ($code)", Toast.LENGTH_SHORT).show()
-                    onDone(false)
+                    onResult(false, code)
                 }
             },
-            securityToken = t
+            securityToken = tokenValue
         )
     }
 
