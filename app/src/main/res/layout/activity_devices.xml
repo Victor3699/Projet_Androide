@@ -15,246 +15,272 @@
         android:titleTextColor="@color/app_text_primary"
         app:menu="@menu/menu_devices" />
 
-    <WebView
-        android:id="@+id/webHouse"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="240dp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/app_surface"
-        android:orientation="vertical"
-        android:padding="12dp">
-
-        <TextView
-            android:id="@+id/tvHouseId"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Maison : #"
-            android:textColor="@color/app_text_primary"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvOwner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Propriétaire : (à venir)"
-            android:textColor="@color/app_text_secondary" />
-
-        <TextView
-            android:id="@+id/tvLightsOn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Lumières allumées : 0"
-            android:textColor="@color/app_text_secondary" />
-
-        <TextView
-            android:id="@+id/tvShuttersOpen"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Volets ouverts : 0"
-            android:textColor="@color/app_text_secondary" />
-
-        <TextView
-            android:id="@+id/tvDoorsOpen"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Portes ouvertes : 0"
-            android:textColor="@color/app_text_secondary" />
-
-        <TextView
-            android:id="@+id/tvGarageOpen"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Garage ouvert : 0"
-            android:textColor="@color/app_text_secondary" />
-    </LinearLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnToggleComponents"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="12dp"
-        android:text="1 • Composants"
-        android:textColor="@color/app_text_primary"
-        app:backgroundTint="@color/app_accent_dark" />
-
-    <LinearLayout
-        android:id="@+id/panelComponents"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:background="@color/app_surface"
-        android:orientation="vertical"
-        android:padding="12dp"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Filtres"
-            android:textColor="@color/app_text_primary"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:background="@drawable/bg_device_item"
-            android:orientation="horizontal"
-            android:padding="8dp">
+            android:orientation="vertical"
+            android:paddingBottom="12dp">
+
+            <WebView
+                android:id="@+id/webHouse"
+                android:layout_width="match_parent"
+                android:layout_height="220dp" />
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@color/app_surface"
                 android:orientation="vertical"
-                android:padding="6dp">
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/tvHouseId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Maison : #"
+                    android:textColor="@color/app_text_primary"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvOwner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Propriétaire : (à venir)"
+                    android:textColor="@color/app_text_secondary" />
+
+                <TextView
+                    android:id="@+id/tvLightsOn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lumières allumées : 0"
+                    android:textColor="@color/app_text_secondary" />
+
+                <TextView
+                    android:id="@+id/tvShuttersOpen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Volets ouverts : 0"
+                    android:textColor="@color/app_text_secondary" />
+
+                <TextView
+                    android:id="@+id/tvDoorsOpen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Portes ouvertes : 0"
+                    android:textColor="@color/app_text_secondary" />
+
+                <TextView
+                    android:id="@+id/tvGarageOpen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Garage ouvert : 0"
+                    android:textColor="@color/app_text_secondary" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnToggleComponents"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="12dp"
+                android:text="1 • Composants"
+                android:textColor="@color/app_text_primary"
+                app:backgroundTint="@color/app_accent_dark" />
+
+            <LinearLayout
+                android:id="@+id/panelComponents"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:background="@color/app_surface"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Type"
-                    android:textColor="@color/app_text_secondary"
+                    android:text="Filtres"
+                    android:textColor="@color/app_text_primary"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <Spinner
-                    android:id="@+id/spinnerType"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
                     android:background="@drawable/bg_device_item"
-                    android:dropDownVerticalOffset="4dp"
-                    android:popupBackground="@color/app_surface"
-                    android:padding="8dp" />
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:padding="6dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Type"
+                            android:textColor="@color/app_text_secondary"
+                            android:textStyle="bold" />
+
+                        <Spinner
+                            android:id="@+id/spinnerType"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_device_item"
+                            android:dropDownVerticalOffset="4dp"
+                            android:popupBackground="@color/app_surface"
+                            android:padding="8dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:padding="6dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="État"
+                            android:textColor="@color/app_text_secondary"
+                            android:textStyle="bold" />
+
+                        <Spinner
+                            android:id="@+id/spinnerState"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_device_item"
+                            android:dropDownVerticalOffset="4dp"
+                            android:popupBackground="@color/app_surface"
+                            android:padding="8dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnSelectAll"
+                            style="@style/Widget.Material3.Button.TonalButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tout sélectionner" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnClearSelection"
+                            style="@style/Widget.Material3.Button.TonalButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Tout désélectionner" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="end"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnBatchOn"
+                            style="@style/Widget.Material3.Button.TonalButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Activer" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnBatchOff"
+                            style="@style/Widget.Material3.Button.TonalButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Désactiver" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/containerDevices"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical" />
             </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnToggleGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="12dp"
+                android:text="2 • Commande de groupe (à venir)"
+                android:textColor="@color/app_text_primary"
+                app:backgroundTint="@color/app_accent_dark" />
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:id="@+id/panelGroup"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:padding="6dp">
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:background="@color/app_surface"
+                android:padding="12dp"
+                android:visibility="gone" />
 
-                <TextView
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnToggleUsers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="12dp"
+                android:text="3 • Utilisateurs (à venir)"
+                android:textColor="@color/app_text_primary"
+                app:backgroundTint="@color/app_accent_dark" />
+
+            <LinearLayout
+                android:id="@+id/panelUsers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:background="@color/app_surface"
+                android:padding="12dp"
+                android:visibility="gone">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddUser"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="État"
-                    android:textColor="@color/app_text_secondary"
-                    android:textStyle="bold" />
-
-                <Spinner
-                    android:id="@+id/spinnerState"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_device_item"
-                    android:dropDownVerticalOffset="4dp"
-                    android:popupBackground="@color/app_surface"
-                    android:padding="8dp" />
+                    android:text="+ Add"
+                    android:textColor="@color/app_text_primary"
+                    app:backgroundTint="@color/app_button_neutral" />
             </LinearLayout>
+
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="end"
-            android:orientation="horizontal">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSelectAll"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tout sélectionner" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnClearSelection"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Tout désélectionner" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnBatchOn"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Activer" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnBatchOff"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Désactiver" />
-        </LinearLayout>
-
-        <ListView
-            android:id="@+id/lvDevices"
-            android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:layout_marginTop="8dp"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="8dp" />
-    </LinearLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnToggleGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="12dp"
-        android:text="2 • Commande de groupe (à venir)"
-        android:textColor="@color/app_text_primary"
-        app:backgroundTint="@color/app_accent_dark" />
-
-    <LinearLayout
-        android:id="@+id/panelGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:background="@color/app_surface"
-        android:padding="12dp"
-        android:visibility="gone" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnToggleUsers"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="12dp"
-        android:text="3 • Utilisateurs (à venir)"
-        android:textColor="@color/app_text_primary"
-        app:backgroundTint="@color/app_accent_dark" />
-
-    <LinearLayout
-        android:id="@+id/panelUsers"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:background="@color/app_surface"
-        android:padding="12dp"
-        android:visibility="gone">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAddUser"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="+ Add"
-            android:textColor="@color/app_text_primary"
-            app:backgroundTint="@color/app_button_neutral" />
-    </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>

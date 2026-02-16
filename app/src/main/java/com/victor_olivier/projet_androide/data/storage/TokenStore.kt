@@ -14,7 +14,15 @@ class TokenStore(context: Context) {
         return prefs.getString("token", null)
     }
 
+    fun saveUsername(username: String) {
+        prefs.edit().putString("username", username).apply()
+    }
+
+    fun getUsername(): String? {
+        return prefs.getString("username", null)
+    }
+
     fun clearToken() {
-        prefs.edit().remove("token").apply()
+        prefs.edit().remove("token").remove("username").apply()
     }
 }

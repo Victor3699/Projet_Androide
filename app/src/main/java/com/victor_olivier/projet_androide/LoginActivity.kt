@@ -65,6 +65,7 @@ class LoginActivity : AppCompatActivity() {
                     if (code in 200..299 && body?.token?.isNotBlank() == true) {
                         val token = body.token
                         tokenStore.saveToken(token)
+                        tokenStore.saveUsername(login)
 
                         initBrowserSessionAndContinue(token)
                     } else {
