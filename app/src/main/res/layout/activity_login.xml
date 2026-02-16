@@ -66,5 +66,11 @@
             android:textColor="@color/app_accent"
             android:textSize="16sp" />
 
+        <WebView
+            android:id="@+id/webInitSession"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:visibility="invisible" />
+
     </LinearLayout>
 </ScrollView>
