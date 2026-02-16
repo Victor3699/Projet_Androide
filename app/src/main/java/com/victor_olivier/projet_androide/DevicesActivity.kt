@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
@@ -229,7 +230,6 @@ class DevicesActivity : AppCompatActivity() {
         webView.webChromeClient = WebChromeClient()
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean = false
-
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 loadDevices()
