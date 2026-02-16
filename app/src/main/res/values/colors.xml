@@ -2,4 +2,20 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="app_background">#FF000000</color>
+    <color name="app_surface">#FF0F0F0F</color>
+    <color name="app_surface_variant">#FF141414</color>
+    <color name="app_overlay">#AA000000</color>
+
+    <color name="app_text_primary">#FFFFFFFF</color>
+    <color name="app_text_secondary">#FFCCCCCC</color>
+    <color name="app_text_hint">#FFAAAAAA</color>
+
+    <color name="app_accent">#FF00BFFF</color>
+    <color name="app_accent_dark">#FF1565C0</color>
+    <color name="app_button_dark">#FF1A1A1A</color>
+    <color name="app_button_neutral">#FF333333</color>
+
+    <color name="app_item_stroke">#33FFFFFF</color>
 </resources>
