@@ -1,59 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:background="@color/app_background"
+    android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Connexion"
-        android:textColor="#FFFFFF"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="30dp" />
-
-    <EditText
-        android:id="@+id/etLogin"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Login"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#AAAAAA"
-        android:inputType="textPersonName"
-        android:padding="12dp"
-        android:backgroundTint="#FFFFFF" />
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp">
 
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Mot de passe"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#AAAAAA"
-        android:inputType="textPassword"
-        android:padding="12dp"
-        android:backgroundTint="#FFFFFF"
-        android:layout_marginTop="14dp" />
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:text="Connexion"
+            android:textColor="@color/app_text_primary"
+            android:textSize="26sp"
+            android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/btnDoLogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Se connecter"
-        android:layout_marginTop="20dp" />
+        <EditText
+            android:id="@+id/etLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="username"
+            android:backgroundTint="@color/app_text_primary"
+            android:hint="Login"
+            android:inputType="textPersonName"
+            android:padding="12dp"
+            android:textColor="@color/app_text_primary"
+            android:textColorHint="@color/app_text_hint" />
 
-    <TextView
-        android:id="@+id/tvGoToRegister"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pas encore de compte ? S’inscrire"
-        android:textColor="#00BFFF"
-        android:textSize="16sp"
-        android:layout_marginTop="20dp" />
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:autofillHints="password"
+            android:backgroundTint="@color/app_text_primary"
+            android:hint="Mot de passe"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textColor="@color/app_text_primary"
+            android:textColorHint="@color/app_text_hint" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/btnDoLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:minHeight="48dp"
+            android:text="Se connecter" />
+
+        <TextView
+            android:id="@+id/tvGoToRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="Pas encore de compte ? S’inscrire"
+            android:textColor="@color/app_accent"
+            android:textSize="16sp" />
+
+        <WebView
+            android:id="@+id/webInitSession"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:visibility="invisible" />
+
+    </LinearLayout>
+</ScrollView>
