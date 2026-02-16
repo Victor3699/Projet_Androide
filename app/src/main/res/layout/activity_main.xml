@@ -3,22 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Image background -->
     <ImageView
         android:id="@+id/imgBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/skull"
+        android:alpha="0.90"
         android:scaleType="centerCrop"
-        android:alpha="0.90" />
+        android:src="@drawable/skull" />
 
-    <!-- Dark overlay -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#AA000000" />
+        android:background="@color/app_overlay" />
 
-    <!-- Contenu -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -26,51 +23,47 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <!-- Titre stylisé -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="LE MORT FOU"
-            android:textColor="#FFFFFF"
-            android:textSize="36sp"
-            android:textStyle="bold"
+            android:layout_marginBottom="220dp"
             android:letterSpacing="0.15"
-            android:shadowColor="#00BFFF"
+            android:shadowColor="@color/app_accent"
             android:shadowDx="0"
             android:shadowDy="0"
             android:shadowRadius="18"
-            android:layout_marginBottom="220dp" />
+            android:text="LE MORT FOU"
+            android:textColor="@color/app_text_primary"
+            android:textSize="36sp"
+            android:textStyle="bold" />
 
-        <!-- Boutons dans la zone bouche -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <!-- Inscription -->
             <Button
                 android:id="@+id/btnRegister"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Inscription"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#1A1A1A"
                 android:alpha="0.92"
-                android:padding="14dp" />
+                android:backgroundTint="@color/app_button_dark"
+                android:padding="14dp"
+                android:text="Inscription"
+                android:textColor="@color/app_text_primary" />
 
-            <!-- Connexion -->
             <Button
                 android:id="@+id/btnLogin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Connexion"
                 android:layout_marginTop="14dp"
-                android:textColor="#000000"
-                android:backgroundTint="#00BFFF"
                 android:alpha="0.95"
-                android:padding="14dp" />
+                android:backgroundTint="@color/app_accent"
+                android:padding="14dp"
+                android:text="Connexion"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 

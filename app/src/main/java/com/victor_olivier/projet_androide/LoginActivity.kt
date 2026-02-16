@@ -2,7 +2,12 @@ package com.victor_olivier.projet_androide
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -17,6 +22,9 @@ import com.victor_olivier.projet_androide.data.storage.TokenStore
 
 class LoginActivity : AppCompatActivity() {
 
+    private lateinit var webInitSession: WebView
+    private var hasContinuedAfterInit = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -25,6 +33,8 @@ class LoginActivity : AppCompatActivity() {
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnDoLogin = findViewById<Button>(R.id.btnDoLogin)
         val tvGoToRegister = findViewById<TextView>(R.id.tvGoToRegister)
+
+        webInitSession = findViewById(R.id.webInitSession)
 
         tvGoToRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
@@ -55,10 +65,9 @@ class LoginActivity : AppCompatActivity() {
                     if (code in 200..299 && body?.token?.isNotBlank() == true) {
                         val token = body.token
                         tokenStore.saveToken(token)
+                        tokenStore.saveUsername(login)
 
-                        // Récupère houseId puis va sur DevicesActivity
-                        loadHousesAndGo(token)
-
+                        initBrowserSessionAndContinue(token)
                     } else {
                         val msg = when (code) {
                             401 -> "Identifiants invalides"
@@ -70,6 +79,34 @@ class LoginActivity : AppCompatActivity() {
                 }
             )
         }
+    }
+
+    private fun initBrowserSessionAndContinue(token: String) {
+        hasContinuedAfterInit = false
+
+        val settings = webInitSession.settings
+        settings.javaScriptEnabled = true
+        settings.domStorageEnabled = true
+        settings.cacheMode = WebSettings.LOAD_DEFAULT
+
+        webInitSession.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                continueToHousesOnce(token)
+            }
+        }
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            continueToHousesOnce(token)
+        }, 800)
+
+        webInitSession.loadUrl(ApiRoutes.BASE)
+    }
+
+    private fun continueToHousesOnce(token: String) {
+        if (hasContinuedAfterInit) return
+        hasContinuedAfterInit = true
+        loadHousesAndGo(token)
     }
 
     private fun loadHousesAndGo(token: String) {

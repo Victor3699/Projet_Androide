@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/action_username"
+        android:enabled="false"
+        android:showAsAction="always"
+        android:title="Utilisateur" />
+
+    <item
         android:id="@+id/action_logout"
-        android:title="Déconnexion"
-        android:showAsAction="always" />
+        android:showAsAction="always"
+        android:title="Se déconnecter" />
 </menu>
