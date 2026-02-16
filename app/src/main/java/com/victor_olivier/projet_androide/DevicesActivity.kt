@@ -48,6 +48,15 @@ class DevicesActivity : AppCompatActivity() {
         private val COMMAND_OFF_CANDIDATES = listOf("off", "close", "down", "turn off", "turn_off")
     }
 
+
+    private data class CommandPayload(val command: String)
+
+    private data class CommandAttempt(
+        val url: String,
+        val method: String,
+        val payload: CommandPayload? = null
+    )
+
     private var houseId: Int = -1
     private var token: String? = null
     private lateinit var houseUrl: String
@@ -377,14 +386,20 @@ class DevicesActivity : AppCompatActivity() {
         }
 
         val encodedCommand = Uri.encode(command)
-        val candidateUrls = listOf(
-            ApiRoutes.DEVICE_COMMAND_PATH(houseId, device.id, encodedCommand),
-            ApiRoutes.DEVICE_COMMANDS_PATH(houseId, device.id, encodedCommand),
-            ApiRoutes.DEVICE_COMMAND_QUERY(houseId, device.id, encodedCommand)
+        val payload = CommandPayload(command)
+        val attempts = listOf(
+            CommandAttempt(ApiRoutes.DEVICE_COMMAND_PATH(houseId, device.id, encodedCommand), "PUT"),
+            CommandAttempt(ApiRoutes.DEVICE_COMMANDS_PATH(houseId, device.id, encodedCommand), "PUT"),
+            CommandAttempt(ApiRoutes.DEVICE_COMMAND_QUERY(houseId, device.id, encodedCommand), "PUT"),
+            CommandAttempt(ApiRoutes.DEVICE_COMMAND(houseId, device.id), "PUT", payload),
+            CommandAttempt(ApiRoutes.DEVICE_COMMANDS(houseId, device.id), "PUT", payload),
+            CommandAttempt(ApiRoutes.DEVICE_COMMAND(houseId, device.id), "POST", payload),
+            CommandAttempt(ApiRoutes.DEVICE_COMMANDS(houseId, device.id), "POST", payload),
+            CommandAttempt(ApiRoutes.DEVICE(houseId, device.id), "PUT", payload)
         )
 
         tryCommandWithFallback(
-            urls = candidateUrls,
+            attempts = attempts,
             index = 0,
             tokenValue = t,
             onResult = { success, lastCode ->
@@ -397,30 +412,49 @@ class DevicesActivity : AppCompatActivity() {
     }
 
     private fun tryCommandWithFallback(
-        urls: List<String>,
+        attempts: List<CommandAttempt>,
         index: Int,
         tokenValue: String,
         onResult: (Boolean, Int?) -> Unit
     ) {
-        if (index >= urls.size) {
+        if (index >= attempts.size) {
             onResult(false, null)
             return
         }
 
-        Api().request<Unit>(
-            urls[index],
-            method = "PUT",
-            onSuccess = { code ->
-                if (code in 200..299) {
-                    onResult(true, code)
-                } else if (code == 404 && index < urls.lastIndex) {
-                    tryCommandWithFallback(urls, index + 1, tokenValue, onResult)
-                } else {
-                    onResult(false, code)
-                }
-            },
-            securityToken = tokenValue
-        )
+        val attempt = attempts[index]
+        if (attempt.payload != null) {
+            Api().request<Unit, CommandPayload>(
+                attempt.url,
+                method = attempt.method,
+                data = attempt.payload,
+                onSuccess = { code, _ ->
+                    if (code in 200..299) {
+                        onResult(true, code)
+                    } else if (code in listOf(400, 404, 405) && index < attempts.lastIndex) {
+                        tryCommandWithFallback(attempts, index + 1, tokenValue, onResult)
+                    } else {
+                        onResult(false, code)
+                    }
+                },
+                securityToken = tokenValue
+            )
+        } else {
+            Api().request<Unit>(
+                attempt.url,
+                method = attempt.method,
+                onSuccess = { code ->
+                    if (code in 200..299) {
+                        onResult(true, code)
+                    } else if (code in listOf(400, 404, 405) && index < attempts.lastIndex) {
+                        tryCommandWithFallback(attempts, index + 1, tokenValue, onResult)
+                    } else {
+                        onResult(false, code)
+                    }
+                },
+                securityToken = tokenValue
+            )
+        }
     }
 
     private fun resolveCommand(device: Device, targetOn: Boolean): String? {
