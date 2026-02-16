@@ -3,6 +3,8 @@ package com.victor_olivier.projet_androide
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -79,10 +81,12 @@ class DevicesActivity : AppCompatActivity() {
     private lateinit var btnSelectAll: MaterialButton
     private lateinit var btnBatchOn: MaterialButton
     private lateinit var btnBatchOff: MaterialButton
+    private lateinit var btnClearSelection: MaterialButton
 
     private val allDevices = arrayListOf<Device>()
     private val filteredDevices = arrayListOf<Device>()
     private val selectedDeviceIds = linkedSetOf<String>()
+    private val pendingDeviceIds = linkedSetOf<String>()
 
     private lateinit var adapter: DeviceAdapter
 
@@ -98,6 +102,7 @@ class DevicesActivity : AppCompatActivity() {
 
     private var customTabsSession: CustomTabsSession? = null
     private var serviceConnection: CustomTabsServiceConnection? = null
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,6 +149,7 @@ class DevicesActivity : AppCompatActivity() {
         btnSelectAll = findViewById(R.id.btnSelectAll)
         btnBatchOn = findViewById(R.id.btnBatchOn)
         btnBatchOff = findViewById(R.id.btnBatchOff)
+        btnClearSelection = findViewById(R.id.btnClearSelection)
 
         panelComponents.visibility = View.VISIBLE
         panelGroup.visibility = View.GONE
@@ -166,6 +172,11 @@ class DevicesActivity : AppCompatActivity() {
         btnSelectAll.setOnClickListener {
             selectedDeviceIds.clear()
             selectedDeviceIds.addAll(filteredDevices.map { it.id })
+            adapter.notifyDataSetChanged()
+            updateBatchButtonsState()
+        }
+        btnClearSelection.setOnClickListener {
+            selectedDeviceIds.clear()
             adapter.notifyDataSetChanged()
             updateBatchButtonsState()
         }
@@ -255,7 +266,7 @@ class DevicesActivity : AppCompatActivity() {
     }
 
     private fun setupTypeSpinner(types: List<String>) {
-        spinnerType.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, types)
+        spinnerType.adapter = createSpinnerAdapter(types)
         val idx = types.indexOf(selectedType)
         if (idx >= 0) spinnerType.setSelection(idx)
 
@@ -269,13 +280,19 @@ class DevicesActivity : AppCompatActivity() {
     }
 
     private fun setupStateSpinner() {
-        spinnerState.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, DEVICE_STATES)
+        spinnerState.adapter = createSpinnerAdapter(DEVICE_STATES)
         spinnerState.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
                 selectedState = DEVICE_STATES[position]
                 applyFiltersAndRender()
             }
             override fun onNothingSelected(parent: android.widget.AdapterView<*>?) = Unit
+        }
+    }
+
+    private fun createSpinnerAdapter(items: List<String>): ArrayAdapter<String> {
+        return ArrayAdapter(this, R.layout.item_spinner_selected, items).also {
+            it.setDropDownViewResource(R.layout.item_spinner_dropdown)
         }
     }
 
@@ -293,6 +310,7 @@ class DevicesActivity : AppCompatActivity() {
                     alreadyOpenedCustomTabForInit = false
                     allDevices.clear()
                     allDevices.addAll(body.devices)
+                    pendingDeviceIds.clear()
 
                     val types = mutableListOf(FILTER_ALL)
                     types.addAll(allDevices.map { it.type }.distinct().sorted())
@@ -361,8 +379,10 @@ class DevicesActivity : AppCompatActivity() {
     private fun executeCommandAtIndex(targets: List<Device>, index: Int, targetOn: Boolean, successCount: Int) {
         if (index >= targets.size) {
             isBatchRunning = false
+            selectedDeviceIds.clear()
             Toast.makeText(this, "$successCount/${targets.size} commandes exécutées", Toast.LENGTH_SHORT).show()
-            loadDevices()
+            adapter.notifyDataSetChanged()
+            refreshDevicesSoon()
             updateBatchButtonsState()
             return
         }
@@ -472,6 +492,26 @@ class DevicesActivity : AppCompatActivity() {
         btnBatchOn.isEnabled = hasSelection && !isBatchRunning
         btnBatchOff.isEnabled = hasSelection && !isBatchRunning
         btnSelectAll.isEnabled = !isBatchRunning && filteredDevices.isNotEmpty()
+        btnClearSelection.isEnabled = hasSelection && !isBatchRunning
+    }
+
+    private fun refreshDevicesSoon(delayMs: Long = 350L) {
+        mainHandler.postDelayed({ loadDevices() }, delayMs)
+    }
+
+    private fun applyInstantDeviceState(deviceId: String, targetOn: Boolean) {
+        val index = allDevices.indexOfFirst { it.id == deviceId }
+        if (index < 0) return
+
+        val current = allDevices[index]
+        val updated = when {
+            current.power != null -> current.copy(power = if (targetOn) 100 else 0)
+            current.opening != null -> current.copy(opening = if (targetOn) 100 else 0)
+            else -> current
+        }
+        allDevices[index] = updated
+        updateInfoPanel()
+        applyFiltersAndRender()
     }
 
     private fun normalizeCommand(value: String): String = value.lowercase().replace("_", " ").trim()
@@ -506,31 +546,38 @@ class DevicesActivity : AppCompatActivity() {
                 "État: ${if (on) "1" else "0"}"
             }
 
+            val isPending = pendingDeviceIds.contains(device.id)
+
             cb.setOnCheckedChangeListener(null)
             cb.isChecked = selectedDeviceIds.contains(device.id)
+            cb.isEnabled = !isBatchRunning && !isPending
             cb.setOnCheckedChangeListener { _, checked ->
                 if (checked) selectedDeviceIds.add(device.id) else selectedDeviceIds.remove(device.id)
                 updateBatchButtonsState()
             }
 
             sw.setOnCheckedChangeListener(null)
-            sw.isEnabled = hasAction && !isBatchRunning
+            sw.isEnabled = hasAction && !isBatchRunning && !isPending
             sw.isChecked = on
             sw.text = if (sw.isChecked) "1" else "0"
             sw.setOnCheckedChangeListener { _, isChecked ->
-                if (!hasAction) return@setOnCheckedChangeListener
+                if (!hasAction || pendingDeviceIds.contains(device.id)) return@setOnCheckedChangeListener
+
+                pendingDeviceIds.add(device.id)
                 sw.isEnabled = false
                 sw.text = if (isChecked) "1" else "0"
+
                 sendCommandToDevice(device, isChecked) { success ->
                     runOnUiThread {
+                        pendingDeviceIds.remove(device.id)
                         if (!success) {
                             sw.setOnCheckedChangeListener(null)
                             sw.isChecked = !isChecked
                             sw.text = if (sw.isChecked) "1" else "0"
-                            sw.setOnCheckedChangeListener { _, _ -> }
                             adapter.notifyDataSetChanged()
                         } else {
-                            loadDevices()
+                            applyInstantDeviceState(device.id, isChecked)
+                            refreshDevicesSoon()
                         }
                     }
                 }

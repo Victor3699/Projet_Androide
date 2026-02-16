@@ -113,7 +113,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="6dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -125,14 +126,19 @@
                 <Spinner
                     android:id="@+id/spinnerType"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_device_item"
+                    android:dropDownVerticalOffset="4dp"
+                    android:popupBackground="@color/app_surface"
+                    android:padding="8dp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="6dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -144,7 +150,11 @@
                 <Spinner
                     android:id="@+id/spinnerState"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_device_item"
+                    android:dropDownVerticalOffset="4dp"
+                    android:popupBackground="@color/app_surface"
+                    android:padding="8dp" />
             </LinearLayout>
         </LinearLayout>
 
@@ -161,6 +171,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tout sélectionner" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClearSelection"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Tout désélectionner" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnBatchOn"
